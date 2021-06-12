@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import contactsAction from '../../redux/contact/contact-action';
 import style from './ContactList.module.css';
 import PropTypes from 'prop-types';
 
@@ -33,4 +35,29 @@ ContactList.propTypes = {
   deleteContacts: PropTypes.func,
 };
 
-export default ContactList;
+const getVisibleContacts = (allContacts, filter) => {
+  const normalizedFilter = filter.toLowerCase();
+  return allContacts.filter(({ name }) =>
+    name.toLowerCase().includes(normalizedFilter),
+  );
+};
+
+// 1 вариант
+// const mapStateToProps = state => {
+//   const { items, filter } = state.contacts;
+//   const visibleContacts = getVisibleContacts(items, filter);
+//   return {
+//     contacts: visibleContacts,
+//   };
+// };
+
+// 2 вариант
+const mapStateToProps = ({ contacts: { items, filter } }) => ({
+  contacts: getVisibleContacts(items, filter),
+});
+
+const mapDispatchToProps = dispatch => ({
+  deleteContacts: id => dispatch(contactsAction.deleteContacts(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
